@@ -58,8 +58,6 @@ io.on('connection', (socket) => {
       myUserName, myRoomName and setter in socketer.js
     */
     callback()
-
-    
   })
 
   /*
@@ -86,8 +84,19 @@ io.on('connection', (socket) => {
     }
   })
 
+  socket.on('requestMove', (params) => {
+    const user = users.getUser(socket.id)
+    const roomName = user.room
+    socket.broadcast.to(roomName).emit('doMove', {piece:params.piece, row:params.row, col:params.col})
+  })  
+
   socket.on('disconnect', () => {
     var user = users.removeUser(socket.id)
+    if(user && users.getUserList(user.room).length !== 0){
+      console.log(`User ${user.name} disconected`)
+      socket.to(user.room).emit('oppDisconnect') //handle later
+    }
+    
   })
 })
 

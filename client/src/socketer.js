@@ -13,6 +13,7 @@ const socket = io();
 let myUserName
 let myRoomName
 let setter //wait, start, color
+let mover //current, row, col
 
 socket.on('connect', () => {
   console.log('socket connection established')
@@ -33,6 +34,10 @@ socket.on('startGame', (params) => {
     setter(false, true, 'black')
     console.log('player is black')
   }
+})
+
+socket.on('doMove', (params) => {
+  mover(params.piece, params.row, params.col)
 })
 
 
@@ -63,6 +68,15 @@ const initiateGame = (username, roomName, setGameFlag) => {
   
 }
 
+const setMover = (moveFunction) => {
+  mover = moveFunction
+}
+
+const requestMoveEvent = (piece, row, col) => {
+  console.log(`At requestMoveEvent function, row:${row} and col:${col}`, piece)
+  socket.emit('requestMove', {piece, row, col})
+}
 
 
-export {initiateGame}
+
+export {initiateGame, requestMoveEvent, setMover}

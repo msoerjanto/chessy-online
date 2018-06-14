@@ -12,6 +12,8 @@ import CheckDisplay from './amenities/CheckDisplay';
 import TestDisplay from './amenities/TestDisplay';
 import CoverGenerator from './utils/CoverGenerator';
 import {searchArray, setUpInitialTile, getComponentByID, copyTiles} from './utils/utils'
+import {initiateGame, requestMoveEvent, setMover} from '../socketer'
+
 
 class Game extends React.Component{
   constructor(props){
@@ -54,6 +56,19 @@ class Game extends React.Component{
       opponentPieceComponents: init.opponentPieceComponents,
      
     };
+
+    setMover((piece, row, col) => {
+      const history = this.state.history.slice(0, this.state.stepNumber + 1);
+      const current = history[this.state.stepNumber];
+      const tiles = copyTiles(current)
+      const m_row = 7 - row
+      const m_col = 7 - col
+      piece.col = 7 - piece.col
+      piece.row = 7 - piece.row
+      console.log('piece to move', piece)
+      console.log(`moving to [${m_row},${m_col}]`)
+      this.movePiece(m_row,m_col, piece, tiles, history)
+    })
     
   }
 
@@ -166,39 +181,18 @@ class Game extends React.Component{
       //always reset current to null after each successful move
       this.setState({
           history: history.concat([{tiles:tiles}]),
-          playerIsNext: !this.state.playerIsNext,
+          playerIsNext: !this.state.playerIsNext, //might need to move
           stepNumber: history.length,
           current: null,
-          highlightedTiles: [],
         });
   }
 
-  movePiece(tiles, row, col, target, history){
-    const target_component = target.component;
-    const target_value = target.value;
-    const current = this.state.current;
-    const cover = this.state.highlightedTiles;
-    if(!searchArray(cover,[row,col]))
-    {
-      //if [row,col] is not in cover, then the selected tile is invalid
-      //reset the tile highlighting
-      //const tempHighlight = this.state.highlightedTiles;
-      for(let i = 0; i < cover.length; i++)
-      {
-          const curr_coord = cover[i];
-          const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
-          const m_color = currTileContent.initColor;
-          tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color: m_color};
-        }
-        history[history.length-1] = {...history[history.length-1], tiles:tiles};
-        this.setState({
-          history: history,
-          current: null,
-          highlightedTiles: [],
-        });
-        return;
-      }
-      
+  movePiece(row, col, current, tiles, history){  
+      console.log('my tiles', tiles)
+      const target = tiles[row][col]
+      const target_component = target.component;
+      const target_value = target.value;
+
       //handles castling and basic king moves
       let movedRook;
       let coordSource;
@@ -314,23 +308,15 @@ class Game extends React.Component{
           this.setState({playerPieces: oppPieces, opponentPieces: movedPieces},() => { this.updateState(tiles, this.state.opponent) })
         }else{
           //move scenario
-          this.setState({opponentPieces:movedPieces},() => { this.updateState(tiles, this.state.opponent) });
+          this.setState({opponentPieces:movedPieces},() => { 
+            console.log('opponentPieces', this.state.opponentPieces)
+            this.updateState(tiles, this.state.opponent) });
         }
       }
 
-      
-      //reset the tile highlighting
-      const tempHighlight = this.state.highlightedTiles;
-      for(let i = 0; i < tempHighlight.length; i++)
-      {
-        const curr_coord = tempHighlight[i];
-        const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
-        const m_color = currTileContent.initColor;
-        tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color: m_color};
-      }
-
-
       this.updateMovedStates(current, history, tiles)
+      
+      
   }
 
   tileClickHandler(row, col)
@@ -401,7 +387,46 @@ class Game extends React.Component{
           - we can omit color within data since it is the color of the tile and should not be modified
           - note that value also has a color field that corresponds to the players
       */
-      this.movePiece(tiles, row, col, target, history)
+      const current = this.state.current;
+      const cover = this.state.highlightedTiles;
+      if(!searchArray(cover,[row,col]))
+      {
+        //if [row,col] is not in cover, then the selected tile is invalid
+        //reset the tile highlighting
+        //const tempHighlight = this.state.highlightedTiles;
+        for(let i = 0; i < cover.length; i++)
+        {
+            const curr_coord = cover[i];
+            const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
+            const m_color = currTileContent.initColor;
+            tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color: m_color};
+          }
+          history[history.length-1] = {...history[history.length-1], tiles:tiles};
+          this.setState({
+            history: history,
+            current: null,
+            highlightedTiles: [],
+          });
+          return;
+      }
+      
+      this.movePiece(row, col, current, tiles, history)
+      //reset the tile highlighting
+      const tempHighlight = this.state.highlightedTiles;
+      for(let i = 0; i < tempHighlight.length; i++)
+      {
+        const curr_coord = tempHighlight[i];
+        const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
+        const m_color = currTileContent.initColor;
+        tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color: m_color};
+      }
+      this.setState({highlightedTiles: []})
+      
+      requestMoveEvent(current, row, col)
+      
+
+
+      
     }
   }
 
@@ -464,7 +489,7 @@ class Game extends React.Component{
                     playerCapturedPieces: playerCapturedPieces,
                     opponentCapturedPieces: opponentCapturedPieces}, 
                     () => {
-                      const playerCover = this.generateAbsoluteCover(tiles, this.state.player, this.castlingState())
+                      const playerCover = this.state.coverGen.generateAbsoluteCover(tiles, this.state.player, this.castlingState())
                       const oppCover = this.state.coverGen.generateAbsoluteCover(tiles, this.state.opponent, this.castlingState())
                       const playerCheck = this.testCheck(this.state.player, oppCover);
                       const oppCheck = this.testCheck(this.state.opponent, playerCover);
@@ -490,8 +515,7 @@ class Game extends React.Component{
   render(){
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    console.log("step number " + this.state.stepNumber);
-    console.log(current);
+    
     const rank = this.state.rank;
     const selected = this.state.current;
 
@@ -500,20 +524,13 @@ class Game extends React.Component{
 
     if(this.state.checkMate)
     { 
-      let winner;
-      if(!this.state.playerIsNext)
-      {
-        winner = this.state.player;
-      }else
-      {
-        winner = this.state.opponent;
-      }
+      let winner = (!this.state.playerIsNext) ? this.state.player : this.state.opponent
       checkMate = (<p>CHECK MATE! {winner} wins!</p>);
     }else if(this.state.playerChecked || this.state.opponentChecked)
     {
       check = (<p>CHECK</p>);
     }
-
+    console.log(current.tiles)
     return(
       <div className="game">
         {checkMate}
