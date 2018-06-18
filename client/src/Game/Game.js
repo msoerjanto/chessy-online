@@ -58,16 +58,24 @@ class Game extends React.Component{
     };
 
     setMover((piece, row, col) => {
+      
       const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[this.state.stepNumber];
       const tiles = copyTiles(current)
       const m_row = 7 - row
       const m_col = 7 - col
+      
+      //determine the value of piece
       piece.col = 7 - piece.col
       piece.row = 7 - piece.row
+      console.log(tiles[piece.row][piece.col])
+      const target = tiles[piece.row][piece.col]
+      const curr = {data:target, row:piece.row, col:piece.col}
+
+
       console.log('piece to move', piece)
       console.log(`moving to [${m_row},${m_col}]`)
-      this.movePiece(m_row,m_col, piece, tiles, history)
+      this.movePiece(m_row,m_col, curr, tiles, history)
     })
     
   }
@@ -178,6 +186,7 @@ class Game extends React.Component{
           this.setState({opponentRook1Moved: true});
         }
       }
+      console.log('this is tiles from updateMovedStates', tiles)
       //always reset current to null after each successful move
       this.setState({
           history: history.concat([{tiles:tiles}]),
@@ -187,8 +196,8 @@ class Game extends React.Component{
         });
   }
 
-  movePiece(row, col, current, tiles, history){  
-      console.log('my tiles', tiles)
+  movePiece(row, col, current, tiles, history){ 
+      console.log('my tiles from movePiece', tiles)
       const target = tiles[row][col]
       const target_component = target.component;
       const target_value = target.value;
@@ -331,8 +340,6 @@ class Game extends React.Component{
     const target_component = target.component;
     const target_value = target.value;
 
-    let kingSelected = false;
-    let curr_cover;
     let enterHighlightStage = false;
 
     if(this.state.current === null)
@@ -357,22 +364,22 @@ class Game extends React.Component{
         }
       }
       //the below code previously allowed user to select opponent pieces
-      // else
-      // {
-      //   if(target_value != null)
-      //   {
-      //     if(target_value.color === this.state.opponent)
-      //     {
-      //       //opponent has selected a piece (target)
-      //       this.setState({current: {data:target, row:row, col:col}});
-      //       enterHighlightStage = true;
-      //     }else
-      //     {
-      //       console.log("opponent attempted to move player piece");
-      //       return;
-      //     } 
-      //   }
-      // }
+      else
+      {
+        if(target_value != null)
+        {
+          if(target_value.color === this.state.opponent)
+          {
+            //opponent has selected a piece (target)
+            this.setState({current: {data:target, row:row, col:col}});
+            enterHighlightStage = true;
+          }else
+          {
+            console.log("opponent attempted to move player piece");
+            return;
+          } 
+        }
+      }
       
       if(enterHighlightStage)
         this.highlightTiles(target, row, col, tiles, history)
@@ -409,7 +416,7 @@ class Game extends React.Component{
           });
           return;
       }
-      
+      requestMoveEvent(current, row, col)
       this.movePiece(row, col, current, tiles, history)
       //reset the tile highlighting
       const tempHighlight = this.state.highlightedTiles;
@@ -422,7 +429,7 @@ class Game extends React.Component{
       }
       this.setState({highlightedTiles: []})
       
-      requestMoveEvent(current, row, col)
+    
       
 
 
