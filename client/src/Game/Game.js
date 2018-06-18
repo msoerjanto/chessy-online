@@ -364,22 +364,22 @@ class Game extends React.Component{
         }
       }
       //the below code previously allowed user to select opponent pieces
-      else
-      {
-        if(target_value != null)
-        {
-          if(target_value.color === this.state.opponent)
-          {
-            //opponent has selected a piece (target)
-            this.setState({current: {data:target, row:row, col:col}});
-            enterHighlightStage = true;
-          }else
-          {
-            console.log("opponent attempted to move player piece");
-            return;
-          } 
-        }
-      }
+      // else
+      // {
+      //   if(target_value != null)
+      //   {
+      //     if(target_value.color === this.state.opponent)
+      //     {
+      //       //opponent has selected a piece (target)
+      //       this.setState({current: {data:target, row:row, col:col}});
+      //       enterHighlightStage = true;
+      //     }else
+      //     {
+      //       console.log("opponent attempted to move player piece");
+      //       return;
+      //     } 
+      //   }
+      // }
       
       if(enterHighlightStage)
         this.highlightTiles(target, row, col, tiles, history)
