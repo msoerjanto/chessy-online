@@ -505,6 +505,7 @@ class CoverGenerator
     let turnOpponent;
 
     //we initialize the proper piece set to generate the cover
+    console.log('my current',current)
     if(current.data.value.color === this.state.player)
     {
       //it is the player's turn so we want to generate cover for opponent
@@ -608,16 +609,8 @@ class CoverGenerator
   generateAbsoluteCover(tiles, color, state)
   {
     //the set of pieces for which we test each possible moves for
-    let pieceSet;
-    let pieceSetCover;
-    if(color === this.state.player)
-    {
-      pieceSet = {...state.playerPieces};
-      pieceSetCover = {...state.playerPiecesCover};
-    }else{
-      pieceSet = {...state.opponentPieces};
-      pieceSetCover = {...state.opponentPiecesCover};
-    }
+    let pieceSet = (color === this.state.player) ? {...state.playerPieces} : {...state.opponentPieces}
+    let pieceSetCover = (color === this.state.player) ? {...state.playerPiecesCover} : {...state.opponentPiecesCover}
 
     const myIDs = this.state.myIDs;
     for(let i = 0; i < myIDs.length; i++){
@@ -628,6 +621,7 @@ class CoverGenerator
         pieceSetCover[currentID] = [];
         continue;
       }
+      console.log('currentCoord',currentCoord)
       const currentUnfilteredCover = this.generateCoverByID(currentCoord[0], currentCoord[1], color, tiles, currentID, state);
       const currentFilteredCover = this.boardTest(tiles, currentUnfilteredCover, {data:tiles[currentCoord[0]][currentCoord[1]], row:currentCoord[0], col:currentCoord[1]}, state);
       pieceSetCover[currentID] = currentFilteredCover;

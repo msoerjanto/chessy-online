@@ -66,7 +66,7 @@ const setUpInitialTile = (player, opponent) => {
     {
       const pawnID = "pawn" + j;
       initial[6][j] = {...initial[6][j], value:{piece: "pawn", color:player, ID: pawnID} ,component: playerPieceComponents.pawn};
-       initial[1][j] = {...initial[1][j], value:{piece: "pawn", color:opponent, ID:pawnID} ,component: opponentPieceComponents.pawn};
+       initial[1][7-j] = {...initial[1][7-j], value:{piece: "pawn", color:opponent, ID:pawnID} ,component: opponentPieceComponents.pawn};
     }
 
     //initalize the other pieces for the player
@@ -150,9 +150,9 @@ const setUpInitialTile = (player, opponent) => {
     for(let i = 0; i < 8; i++)
     {
       playerPieces["pawn" + i] = [6,i];
-      opponentPieces["pawn" + i] = [1,i];
+      opponentPieces["pawn" + i] = [1,7 - i];
       playerPiecesCover["pawn" + i] = [[5,i],[4,i]];
-      opponentPiecesCover["pawn"+i] = [[2,i],[3,i]];      
+      opponentPiecesCover["pawn"+ i] = [[2,7-i],[3,7-i]];      
     }
 
     const myIDs = ["pawn0", "pawn1", "pawn2", "pawn3", "pawn4", "pawn5", "pawn6", "pawn7", "rook0", "rook1", "knight0", "knight1", "bishop0", "bishop1", "queen", "king"]
