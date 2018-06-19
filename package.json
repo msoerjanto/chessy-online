@@ -8,8 +8,13 @@
     "client": "cd client && yarn start",
     "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"yarn server\" \"yarn client\"",
-    "start": "node server.js"
+    "start": "node server.js",
+    "heroku-postbuild": "cd client/ && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
   },
+  "cacheDirectories": [
+    "node_modules",
+    "client/node_modules"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -22,6 +27,12 @@
     "passport-local": "^1.0.0",
     "socket.io": "^2.1.1"
   },
+  "keywords": [
+    "node",
+    "heroku",
+    "create-react-app",
+    "react"
+  ],
   "devDependencies": {
     "concurrently": "^3.5.0"
   }
