@@ -102,7 +102,7 @@ io.on('connection', (socket) => {
 })
 
 // Priority serve any static files.
-app.use(express.static(path.resolve(__dirname, '../client/build')));
+app.use(express.static(path.resolve(__dirname, './client/build')));
 
 app.use(bodyParser.json());
 app.use(passport.initialize());
