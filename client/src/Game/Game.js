@@ -416,7 +416,8 @@ class Game extends React.Component{
           });
           return;
       }
-      requestMoveEvent(current, row, col)
+      
+      requestMoveEvent({row: current.row, col:current.col}, row, col)
       this.movePiece(row, col, current, tiles, history)
       //reset the tile highlighting
       const tempHighlight = this.state.highlightedTiles;
