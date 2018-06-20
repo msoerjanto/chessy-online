@@ -8,6 +8,7 @@ const keys = require('./config/keys');
 const socketIO = require('socket.io')
 const {isRealString} = require('./utils/validation')
 const {Users} = require('./utils/users');
+const path = require('path');
 
 require('./models/user');
 require('./config/passport');
@@ -99,6 +100,9 @@ io.on('connection', (socket) => {
     
   })
 })
+
+// Priority serve any static files.
+app.use(express.static(path.resolve(__dirname, '../client/build')));
 
 app.use(bodyParser.json());
 app.use(passport.initialize());
