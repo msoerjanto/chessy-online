@@ -88,19 +88,19 @@ const setUpInitialTile = (player, opponent) => {
 
     //initialize the other pieces for the opponent
     initial[0][0] =  {...initial[0][0], 
-      value: {piece: "rook", color: opponent, ID:"rook0"}, component: opponentPieceComponents.rook};
-    initial[0][7] =  {...initial[0][7], 
       value: {piece: "rook", color: opponent, ID:"rook1"}, component: opponentPieceComponents.rook};
+    initial[0][7] =  {...initial[0][7], 
+      value: {piece: "rook", color: opponent, ID:"rook0"}, component: opponentPieceComponents.rook};
     //initialize knights
     initial[0][1] = {...initial[0][1],
-      value: {piece: "knight", color: opponent, ID:"knight0"}, component: opponentPieceComponents.knight};
-    initial[0][6] = {...initial[0][6],
       value: {piece: "knight", color: opponent, ID:"knight1"}, component: opponentPieceComponents.knight};
+    initial[0][6] = {...initial[0][6],
+      value: {piece: "knight", color: opponent, ID:"knight0"}, component: opponentPieceComponents.knight};
     //initialize bishops
     initial[0][2] = {...initial[0][2],
-      value: {piece: "bishop", color: opponent, ID:"bishop0"}, component: opponentPieceComponents.bishop};
-    initial[0][5] = {...initial[0][5],
       value: {piece: "bishop", color: opponent, ID:"bishop1"}, component: opponentPieceComponents.bishop};
+    initial[0][5] = {...initial[0][5],
+      value: {piece: "bishop", color: opponent, ID:"bishop0"}, component: opponentPieceComponents.bishop};
     
 
     let playerQueen;
