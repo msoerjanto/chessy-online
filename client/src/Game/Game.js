@@ -219,17 +219,24 @@ class Game extends React.Component{
         if(current.data.value.color === this.state.player)
         { 
           coordSource = {...this.state.playerPieces};
-          coordDest = [[7,3],[7,5]];
+          coordDest = (this.state.player === 'white') ?
+                        [[7,3], [7,5]] : [[7,2], [7,4]]
+          //coordDest = [[7,3],[7,5]];
         }else{
           coordSource = {...this.state.opponentPieces};
-          coordDest = [[0,3],[0,5]];
+          coordDest = (this.state.opponent === 'white') ?
+                        [[0, 2], [0,4]] : [[0, 3], [0,5]]
+          //coordDest = [[0,3],[0,5]];
         }
 
         if(col - current.col === 2)
         {
           //we are doing castling with rook1
           console.log("we are castling");
-          const initCoord = coordSource["rook1"];
+
+          const initCoord = (current.data.value.color === 'white') ?
+                              coordSource["rook1"] : coordSource["rook0"]
+          //const initCoord = coordSource["rook1"];
           finalCoord = coordDest[1];
           movedRook = {value: tiles[initCoord[0]][initCoord[1]].value, component:tiles[initCoord[0]][initCoord[1]].component};
           tiles[initCoord[0]][initCoord[1]] = {...tiles[initCoord[0]][initCoord[1]], value:null, component:null};
@@ -239,7 +246,9 @@ class Game extends React.Component{
         {
           //we are doing castling with rook0
           console.log("we are castling");
-          const initCoord = coordSource["rook0"];
+          const initCoord = (current.data.value.color === 'white') ?
+                              coordSource["rook0"] : coordSource["rook1"]
+          //const initCoord = coordSource["rook0"];
           finalCoord = coordDest[0];
           movedRook = {value: tiles[initCoord[0]][initCoord[1]].value, component:tiles[initCoord[0]][initCoord[1]].component};
           tiles[initCoord[0]][initCoord[1]] = {...tiles[initCoord[0]][initCoord[1]], value:null, component:null};

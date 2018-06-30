@@ -366,11 +366,17 @@ class CoverGenerator
     let clearPath0 = true;
     let clearPath1 = true;
     let rowIndex;
+    let colIndex; 
     let oppCover;
     if(color === this.state.player)
     {
       pieces = {...state.playerPieces};
       rowIndex = 7;
+      colIndex = (this.state.player === 'white') ? [2, 6] : [1, 5];
+      rook0Path = (this.state.player === 'white') ? [[7,1],[7,2],[7,3]]
+                      : [[7,1], [7,2]];
+      rook1Path = (this.state.player === 'white') ? [[7,5],[7,6]]
+                      : [[7,4], [7,5], [7,6]];
       kingMoved = state.playerKingMoved;
       rook0Moved = state.playerRook0Moved;
       rook1Moved = state.playerRook1Moved;
@@ -379,14 +385,21 @@ class CoverGenerator
     }else{
       pieces = {...state.opponentPieces};
       rowIndex = 0;
+      colIndex = (color === 'white') ? [1, 5] : [2, 6];
+      rook0Path = (this.state.opponent === 'white') ? [[0,6],[0,5],[0,4]]
+                      : [[0,1], [0,2]];
+      rook1Path = (this.state.player === 'white') ? [[0,1],[0,2]]
+                      : [[0,1], [0,2], [0,3]];
       kingMoved = state.opponentKingMoved;
       rook0Moved = state.opponentRook0Moved;
       rook1Moved = state.opponentRook1Moved;
       checked = state.opponentChecked;
       oppCover = this.getMergeCover(this.state.player);
     }
-    rook0Path = [[rowIndex,1],[rowIndex,2],[rowIndex,3]];
-    rook1Path = [[rowIndex,5],[rowIndex,6]];
+
+
+    // rook0Path = [[rowIndex,1],[rowIndex,2],[rowIndex,3]];
+    // rook1Path = [[rowIndex,5],[rowIndex,6]];
     kingPosition = pieces["king"];
     rook0Position = pieces["rook0"];
     rook1Position = pieces["rook1"];
@@ -420,16 +433,17 @@ class CoverGenerator
       }
     }
 
+    //if player is currently not checked and king has yet to move
     if(!checked && !kingMoved)
     {
       //add to the return array
       if(!rook0Moved && clearPath0)
       {
-        result =[...result, [rowIndex, 2]];  
+        result =[...result, [rowIndex, colIndex[0]]];  
       }
       if(!rook1Moved && clearPath1)
       {
-        result = [...result, [rowIndex, 6]];
+        result = [...result, [rowIndex, colIndex[1]]];
       }
     }
     return result;

@@ -144,9 +144,9 @@ const setUpInitialTile = (player, opponent) => {
 
     //initialize the variables that contain the coordinates of each piece for both players
     let playerPieces = {rook0:[7,0], rook1:[7,7], knight0: [7,1], knight1:[7,6], bishop0:[7,2], bishop1: [7,5], queen: playerQueen, king:playerKing};
-    let opponentPieces = {rook0:[0,0], rook1:[0,7], knight0:[0,1], knight1: [0,6], bishop0:[0,2], bishop1:[0,5], queen: opponentQueen, king:opponentKing};
+    let opponentPieces = {rook1:[0,0], rook0:[0,7], knight1:[0,1], knight0: [0,6], bishop1:[0,2], bishop0:[0,5], queen: opponentQueen, king:opponentKing};
     let playerPiecesCover = {rook0:[], rook1:[], knight0: [[5,0],[5,2]], knight1:[[5,5],[5,7]], bishop0:[], bishop1: [], queen: [], king:[]};
-    let opponentPiecesCover = {rook0:[], rook1:[], knight0: [[2,0], [2,2]], knight1:[[2,5],[2,7]], bishop0:[], bishop1: [], queen: [], king:[]};
+    let opponentPiecesCover = {rook0:[], rook1:[], knight1: [[2,0], [2,2]], knight0:[[2,5],[2,7]], bishop0:[], bishop1: [], queen: [], king:[]};
     for(let i = 0; i < 8; i++)
     {
       playerPieces["pawn" + i] = [6,i];
