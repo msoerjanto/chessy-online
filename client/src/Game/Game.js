@@ -555,7 +555,6 @@ class Game extends React.Component{
         </div>
         <div className="game-info">
           <TurnIndicator playerTurn={this.state.playerIsNext}/>
-          <button onClick={() => this.jumpTo(this.state.stepNumber-1)}>Undo</button>
         </div>
       </div>
     );
