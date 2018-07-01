@@ -54,7 +54,8 @@ class Game extends React.Component{
       myIDs: init.myIDs,
       playerPieceComponents: init.playerPieceComponents,
       opponentPieceComponents: init.opponentPieceComponents,
-     
+      lastMovedPiecePlayer:[],
+      lastMovedPieceOpp:[],
     };
 
     setMover((piece, row, col) => {
@@ -68,14 +69,18 @@ class Game extends React.Component{
       //determine the value of piece
       piece.col = 7 - piece.col
       piece.row = 7 - piece.row
-      console.log(tiles[piece.row][piece.col])
+      
       const target = tiles[piece.row][piece.col]
       const curr = {data:target, row:piece.row, col:piece.col}
 
+      const postMoveHistory = this.movePiece(m_row,m_col, curr, tiles, history)
+      
+      console.log('postMoveHistory', postMoveHistory)
+      this.resetTiles(tiles, this.state.lastMovedPieceOpp)
+      this.setState({lastMovedPieceOpp: [[piece.row, piece.col], [m_row, m_col]]}, () => {
 
-      console.log('piece to move', piece)
-      console.log(`moving to [${m_row},${m_col}]`)
-      this.movePiece(m_row,m_col, curr, tiles, history)
+        this.highlightTiles(tiles, postMoveHistory, this.state.lastMovedPieceOpp)
+      })
     })
     
   }
@@ -137,21 +142,43 @@ class Game extends React.Component{
     }
   }
 
-  highlightTiles(target, row, col, tiles, history){
-    const m_piece = {data:target, row:row, col:col};
-    let m_pieceCover = (m_piece.data.value.color === this.state.player) ? this.state.playerPiecesCover[m_piece.data.value.ID] : this.state.opponentPiecesCover[m_piece.data.value.ID]
+  highlightTiles(tiles, history, tilesToColor){
     
-    for(let i = 0; i < m_pieceCover.length; i++)
+    for(let i = 0; i < tilesToColor.length; i++)
     {
-      const curr_coord = m_pieceCover[i];
+      const curr_coord = tilesToColor[i];
       const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
       tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color:"highlight square"};
     }
-
-    //keep this regardless
     history[history.length-1] = {...history[history.length-1], tiles:tiles};
-    this.setState({history:history, highlightedTiles: m_pieceCover});
+    this.setState({history:history, highlightedTiles: tilesToColor});
   }
+
+  resetTiles(tiles, tilesToReset){
+    for(let i = 0; i < tilesToReset.length; i++)
+    {
+      const curr_coord = tilesToReset[i];
+      const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
+      const m_color = currTileContent.initColor;
+      tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color: m_color};
+    }
+  }
+
+  // highlightTiles(target, row, col, tiles, history){
+  //   const m_piece = {data:target, row:row, col:col};
+  //   let m_pieceCover = (m_piece.data.value.color === this.state.player) ? this.state.playerPiecesCover[m_piece.data.value.ID] : this.state.opponentPiecesCover[m_piece.data.value.ID]
+    
+  //   for(let i = 0; i < m_pieceCover.length; i++)
+  //   {
+  //     const curr_coord = m_pieceCover[i];
+  //     const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
+  //     tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color:"highlight square"};
+  //   }
+
+  //   //keep this regardless
+  //   history[history.length-1] = {...history[history.length-1], tiles:tiles};
+  //   this.setState({history:history, highlightedTiles: m_pieceCover});
+  // }
 
   updateMovedStates(current, history, tiles){
     if(current.data.value.ID === "king")
@@ -186,7 +213,7 @@ class Game extends React.Component{
           this.setState({opponentRook1Moved: true});
         }
       }
-      console.log('this is tiles from updateMovedStates', tiles)
+      
       //always reset current to null after each successful move
       this.setState({
           history: history.concat([{tiles:tiles}]),
@@ -194,6 +221,7 @@ class Game extends React.Component{
           stepNumber: history.length,
           current: null,
         });
+      return history.concat([{tiles:tiles}])
   }
 
   movePiece(row, col, current, tiles, history){ 
@@ -326,10 +354,7 @@ class Game extends React.Component{
             this.updateState(tiles, this.state.opponent) });
         }
       }
-
-      this.updateMovedStates(current, history, tiles)
-      
-      
+      return this.updateMovedStates(current, history, tiles)
   }
 
   tileClickHandler(row, col)
@@ -385,8 +410,11 @@ class Game extends React.Component{
       //   }
       // }
       
-      if(enterHighlightStage)
-        this.highlightTiles(target, row, col, tiles, history)
+      if(enterHighlightStage){
+        const m_piece = {data:target, row:row, col:col};
+        let m_pieceCover = (m_piece.data.value.color === this.state.player) ? this.state.playerPiecesCover[m_piece.data.value.ID] : this.state.opponentPiecesCover[m_piece.data.value.ID]
+        this.highlightTiles(tiles, history, m_pieceCover)
+      }
 
     }else
     {
@@ -425,20 +453,18 @@ class Game extends React.Component{
       this.movePiece(row, col, current, tiles, history)
       //reset the tile highlighting
       const tempHighlight = this.state.highlightedTiles;
-      for(let i = 0; i < tempHighlight.length; i++)
-      {
-        const curr_coord = tempHighlight[i];
-        const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
-        const m_color = currTileContent.initColor;
-        tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color: m_color};
-      }
-      this.setState({highlightedTiles: []})
+      this.resetTiles(tiles, tempHighlight)
+      // for(let i = 0; i < tempHighlight.length; i++)
+      // {
+      //   const curr_coord = tempHighlight[i];
+      //   const currTileContent = tiles[curr_coord[0]][curr_coord[1]]; 
+      //   const m_color = currTileContent.initColor;
+      //   tiles[curr_coord[0]][curr_coord[1]] = {...currTileContent, color: m_color};
+      // }
       
-    
-      
-
-
-      
+      this.setState({
+        highlightedTiles: [],
+      })
     }
   }
 

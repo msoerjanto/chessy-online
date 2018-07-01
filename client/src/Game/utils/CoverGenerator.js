@@ -519,7 +519,7 @@ class CoverGenerator
     let turnOpponent;
 
     //we initialize the proper piece set to generate the cover
-    console.log('my current',current)
+    
     if(current.data.value.color === this.state.player)
     {
       //it is the player's turn so we want to generate cover for opponent
@@ -635,7 +635,7 @@ class CoverGenerator
         pieceSetCover[currentID] = [];
         continue;
       }
-      console.log('currentCoord',currentCoord)
+      
       const currentUnfilteredCover = this.generateCoverByID(currentCoord[0], currentCoord[1], color, tiles, currentID, state);
       const currentFilteredCover = this.boardTest(tiles, currentUnfilteredCover, {data:tiles[currentCoord[0]][currentCoord[1]], row:currentCoord[0], col:currentCoord[1]}, state);
       pieceSetCover[currentID] = currentFilteredCover;
